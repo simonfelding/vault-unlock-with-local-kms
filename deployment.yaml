@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: local-kms
+  namespace: vault
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: local-kms
+  template:
+    metadata:
+      labels:
+        app: local-kms
+    spec:
+      containers:
+        - name: local-kms
+          image: nsmithuk/local-kms
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: "200m"
+              memory: "512Mi"
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+          volumeMounts:
+          - name: kms-seed
+            mountPath: /init
+            readOnly: true
+      volumes:
+        - name: kms-seed
+          secret:
+            secretName: kms-seed
